@@ -17,7 +17,7 @@ export default async function ProjectPage({ params }: Props) {
       .single(),
     supabase
       .from('secrets')
-      .select('id, key_name, description, created_at, updated_at')
+      .select('id, project_id, key_name, description, created_at, updated_at')
       .eq('project_id', projectId)
       .order('key_name', { ascending: true }),
   ])
