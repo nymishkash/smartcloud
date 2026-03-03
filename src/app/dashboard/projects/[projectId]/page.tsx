@@ -28,18 +28,24 @@ export default async function ProjectPage({ params }: Props) {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <Link href="/dashboard" className="text-gray-400 hover:text-white text-sm">
-            ← Projects
+          <Link href="/dashboard" className="text-gray-400 hover:text-white text-sm inline-flex items-center gap-1 transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Projects
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-2">{project.name}</h1>
+          <h1 className="text-3xl font-bold text-white mt-2 tracking-tight">{project.name}</h1>
+          <span className="inline-block bg-white/5 border border-white/10 text-gray-400 text-xs font-mono px-2 py-0.5 rounded-lg mt-1.5">
+            {project.id}
+          </span>
           {project.description && (
-            <p className="text-gray-400 text-sm mt-1">{project.description}</p>
+            <p className="text-gray-400 text-sm mt-2">{project.description}</p>
           )}
         </div>
-        <Link
-          href={`/dashboard/projects/${projectId}/secrets/new`}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded transition-colors"
-        >
+        <Link href={`/dashboard/projects/${projectId}/secrets/new`} className="btn-primary inline-flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
           Add secret
         </Link>
       </div>

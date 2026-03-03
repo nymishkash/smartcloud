@@ -1,0 +1,22 @@
+{
+  "name": "@smartcloud/cli",
+  "version": "0.1.0",
+  "description": "CLI tool for SmartCloud Secrets Manager",
+  "bin": {
+    "smartcloud": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@smartcloud/sdk": "file:../sdk",
+    "commander": "^13.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

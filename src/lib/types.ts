@@ -67,6 +67,16 @@ export interface FetchSecretResponse {
   fetched_at: string
 }
 
+export interface FetchAllSecretsRequest {
+  project_id: string
+}
+
+export interface FetchAllSecretsResponse {
+  secrets: { key_name: string; value: string }[]
+  project_id: string
+  fetched_at: string
+}
+
 export interface ApiError {
   error: string
 }

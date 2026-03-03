@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { resolveAuth } from '@/lib/auth'
 
-export async function GET() {
-  const supabase = await createServerSupabaseClient()
+export async function GET(request: NextRequest) {
+  const auth = await resolveAuth(request)
+  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { userId, supabase } = auth
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('projects')
     .select('id, name, description, created_at, updated_at')
-    .order('created_at', { ascending: false })
+  if (auth.requiresUserFilter) query = query.eq('user_id', userId)
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

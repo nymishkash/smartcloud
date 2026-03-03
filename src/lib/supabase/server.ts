@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 export async function createServerSupabaseClient() {
@@ -22,6 +23,25 @@ export async function createServerSupabaseClient() {
             // Middleware handles session refresh instead
           }
         },
+      },
+    }
+  )
+}
+
+// Create a Supabase client authenticated with a Bearer token.
+// Unlike the SSR client, this sends the token directly with every request
+// so RLS policies work correctly for programmatic (SDK/CLI) access.
+export function createTokenSupabaseClient(accessToken: string) {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   )

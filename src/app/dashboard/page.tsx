@@ -13,23 +13,26 @@ export default async function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Projects</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Projects</h1>
           <p className="text-gray-400 text-sm mt-1">Manage your secret projects</p>
         </div>
-        <Link
-          href="/dashboard/projects/new"
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded transition-colors"
-        >
+        <Link href="/dashboard/projects/new" className="btn-primary inline-flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
           New project
         </Link>
       </div>
 
       {!projects?.length ? (
-        <div className="text-center py-16 border border-dashed border-gray-700 rounded-lg">
+        <div className="glass-card border-dashed text-center py-16">
+          <svg className="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+          </svg>
           <p className="text-gray-400">No projects yet.</p>
           <Link
             href="/dashboard/projects/new"
-            className="text-blue-400 hover:text-blue-300 text-sm mt-2 inline-block"
+            className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 inline-block transition-colors"
           >
             Create your first project
           </Link>
@@ -40,15 +43,20 @@ export default async function DashboardPage() {
             <Link
               key={project.id}
               href={`/dashboard/projects/${project.id}`}
-              className="block bg-gray-900 border border-gray-800 rounded-lg p-5 hover:border-gray-600 transition-colors"
+              className="group glass-card p-6 hover:shadow-lg hover:shadow-blue-500/5 hover:border-white/20 transition-all duration-200"
             >
-              <h3 className="font-semibold text-white">{project.name}</h3>
+              <h3 className="font-semibold text-white group-hover:text-cyan-400 transition-colors">{project.name}</h3>
               {project.description && (
                 <p className="text-gray-400 text-sm mt-1 line-clamp-2">{project.description}</p>
               )}
-              <p className="text-gray-600 text-xs mt-3">
-                {new Date(project.created_at).toLocaleDateString()}
-              </p>
+              <div className="border-t border-white/5 mt-4 pt-3">
+                <p className="text-gray-500 text-xs font-mono truncate" title={project.id}>
+                  ID: {project.id}
+                </p>
+                <p className="text-gray-600 text-xs mt-1">
+                  {new Date(project.created_at).toLocaleDateString()}
+                </p>
+              </div>
             </Link>
           ))}
         </div>

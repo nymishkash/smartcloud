@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { decrypt } from '@/lib/encryption'
+import { resolveAuth } from '@/lib/auth'
 
 // POST /api/secrets/fetch
 // The AWS GetSecretValue equivalent.
-// Caller provides { project_id, key_name } + Authorization: Bearer <jwt>
+// Caller provides { project_id, key_name } + Authorization: Bearer <jwt | api_key>
 // Returns { key_name, value (plaintext), project_id, secret_id, fetched_at }
 //
 // Security properties:
@@ -14,19 +14,12 @@ import { decrypt } from '@/lib/encryption'
 // - RLS ensures users can only access their own secrets
 // - Every successful fetch is logged in access_logs
 export async function POST(request: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-
-  // Support Bearer token for programmatic access in addition to cookie sessions
-  const authHeader = request.headers.get('authorization')
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.substring(7)
-    await supabase.auth.setSession({ access_token: token, refresh_token: '' })
-  }
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (!user || authError) {
+  const auth = await resolveAuth(request)
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const { userId, supabase } = auth
 
   let body: { project_id?: string; key_name?: string }
   try {
@@ -43,13 +36,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Fetch the secret — RLS ensures user can only see their own rows
-  const { data: secret, error: dbError } = await supabase
+  // Fetch the secret
+  let query = supabase
     .from('secrets')
     .select('id, key_name, encrypted_value, iv, auth_tag, project_id')
     .eq('project_id', project_id)
     .eq('key_name', key_name.toUpperCase())
-    .single()
+  if (auth.requiresUserFilter) query = query.eq('user_id', userId)
+  const { data: secret, error: dbError } = await query.single()
 
   if (dbError || !secret) {
     return NextResponse.json({ error: 'Secret not found' }, { status: 404 })
@@ -73,7 +67,7 @@ export async function POST(request: NextRequest) {
   const serviceClient = createServiceClient()
   await serviceClient.from('access_logs').insert({
     secret_id: secret.id,
-    user_id: user.id,
+    user_id: userId,
     project_id: secret.project_id,
     key_name: secret.key_name,
     action: 'READ',
